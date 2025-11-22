@@ -39,9 +39,8 @@ console.log("✓ Created temp directory");
 console.log(`✓ Copied ${inputFiles.length} input files`);
 console.log("✓ Loaded prompt");
 
-console.log("\n🤖 PERFORM");
+console.log("\n🤖 RUN AGENT");
 console.log("─────────────────────────────────────");
-console.log("Running Claude Code agent...\n");
 
 const claudeProcess = Bun.spawn([
   "claude",
