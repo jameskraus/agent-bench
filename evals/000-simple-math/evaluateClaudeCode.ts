@@ -14,13 +14,16 @@ for (const file of inputFiles) {
   copyFileSync(join(inputDir, file), join(tempDir, file));
 }
 
+// Track spec files for later restoration
+const specFiles = inputFiles.filter(file => file.endsWith(".spec.ts"));
+
 console.log("\nInvoking Claude Code to implement math.ts...");
 const claudeProcess = Bun.spawn([
   "claude",
   "--print",
   "--dangerously-skip-permissions",
   "--output-format", "text",
-  "Please implement the functions in math.ts. The file currently has stub implementations that return undefined. You need to implement add, subtract, multiply, and divide functions. For divide, make sure to return undefined when dividing by zero. Run the tests in math.spec.ts to verify your implementation is correct."
+  "Please implement the functions in math.ts. The file currently has stub implementations that return undefined. You need to implement add, subtract, multiply, and divide functions. For divide, make sure to return undefined when dividing by zero. Run all the spec files to verify your implementation is correct."
 ], {
   cwd: tempDir,
   stdout: "pipe",
@@ -38,8 +41,13 @@ if (stderr) {
   console.log(stderr);
 }
 
-console.log("\n=== Running tests to verify implementation ===");
-const testProcess = Bun.spawn(["bun", "test", join(tempDir, "math.spec.ts")], {
+console.log("\n=== Restoring spec files from input directory ===");
+for (const file of specFiles) {
+  copyFileSync(join(inputDir, file), join(tempDir, file));
+}
+
+console.log("\n=== Running all spec files to verify implementation ===");
+const testProcess = Bun.spawn(["bun", "test", tempDir], {
   cwd: import.meta.dir,
   stdout: "inherit",
   stderr: "inherit",
