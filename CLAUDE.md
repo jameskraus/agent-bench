@@ -6,6 +6,7 @@ The user prefers agents to work autonomously with the following workflow:
 - Regularly push commits to GitHub to keep the remote branch up to date
 - Work proactively without requiring excessive confirmation for standard development tasks
 - Keep the PR updated as work progresses
+- Never ask for permission to commit changes - always commit changes automatically when work is complete
 
 ## Bun Runtime
 
