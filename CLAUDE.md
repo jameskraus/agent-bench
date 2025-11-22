@@ -6,8 +6,8 @@ Each eval contains:
 - `prompt.md` - Task description
 - `input/` - Starting files for the agent
 - `expected/` - Reference implementation
-- `evaluateClaudeCode.ts` - Runner script
-- `checkExpected.ts` - Verification script
+- `evaluateClaudeCode.ts` - Runs the evaluation on Claude Code
+- `checkExpected.ts` - Verifies the expected implementation works correctly
 
 **Important**: If the repository structure or eval conventions change, update this CLAUDE.md file to reflect those changes.
 
