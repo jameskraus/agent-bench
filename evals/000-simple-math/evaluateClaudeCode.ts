@@ -22,7 +22,7 @@ const specFiles = inputFiles.filter(file => file.endsWith(".spec.ts"));
 console.log("Reading prelude and prompt...");
 const prelude = readFileSync(preludeFile, "utf-8").trim();
 const prompt = readFileSync(promptFile, "utf-8").trim();
-const fullPrompt = `${prelude}\n\n${prompt}`;
+const fullPrompt = `${prelude}\n\nHere are your instructions:\n\n${prompt}`;
 
 console.log("\nInvoking Claude Code...");
 const claudeProcess = Bun.spawn([
