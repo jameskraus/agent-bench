@@ -21,7 +21,7 @@ const specFiles = inputFiles.filter(file => file.endsWith(".spec.ts"));
 console.log("Reading prompt from prompt.md...");
 const prompt = readFileSync(promptFile, "utf-8").trim();
 
-console.log("\nInvoking Claude Code to implement math.ts...");
+console.log("\nInvoking Claude Code...");
 const claudeProcess = Bun.spawn([
   "claude",
   "--print",
