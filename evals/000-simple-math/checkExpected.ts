@@ -1,4 +1,4 @@
-import { copyFileSync } from "node:fs";
+import { copyFileSync, unlinkSync } from "node:fs";
 import { join } from "node:path";
 
 // Copy the spec file from input to expected
@@ -18,4 +18,10 @@ const testProcess = Bun.spawn(["bun", "test", expectedSpecPath], {
 });
 
 const exitCode = await testProcess.exited;
+
+// Clean up - remove the spec file from expected directory
+console.log("\nCleaning up...");
+unlinkSync(expectedSpecPath);
+console.log("Spec file removed from expected directory.");
+
 process.exit(exitCode);
