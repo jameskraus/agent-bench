@@ -1,3 +1,13 @@
+## Autonomous Work Preferences
+
+The user prefers agents to work autonomously with the following workflow:
+
+- When working on a new branch, always open a draft PR on GitHub as soon as meaningful work begins
+- Regularly push commits to GitHub to keep the remote branch up to date
+- Work proactively without requiring excessive confirmation for standard development tasks
+- Keep the PR updated as work progresses
+
+## Bun Runtime
 
 Default to using Bun instead of Node.js.
 
