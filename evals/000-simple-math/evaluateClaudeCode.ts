@@ -27,7 +27,9 @@ const promptFile = join(import.meta.dir, "prompt.md");
 
 const prelude = argv.prelude;
 
-console.log(chalk.cyan("\n🔧 Setup"));
+if (argv.verbose) {
+  console.log(chalk.cyan("\n🔧 Setup"));
+}
 
 rmSync(tempDir, { recursive: true, force: true });
 mkdirSync(tempDir, { recursive: true });
@@ -41,11 +43,15 @@ const specFiles = inputFiles.filter(file => file.endsWith(".spec.ts"));
 const prompt = readFileSync(promptFile, "utf-8").trim();
 const fullPrompt = `${prelude}\n\nHere are your instructions:\n\n${prompt}`;
 
-console.log(chalk.gray("  ✓ Created temp directory"));
-console.log(chalk.gray(`  ✓ Copied ${inputFiles.length} input files`));
-console.log(chalk.gray("  ✓ Loaded prompt"));
+if (argv.verbose) {
+  console.log(chalk.gray("  ✓ Created temp directory"));
+  console.log(chalk.gray(`  ✓ Copied ${inputFiles.length} input files`));
+  console.log(chalk.gray("  ✓ Loaded prompt"));
+}
 
-console.log(chalk.blue("\n🤖 Run Agent"));
+if (argv.verbose) {
+  console.log(chalk.blue("\n🤖 Run Agent"));
+}
 
 const claudeProcess = Bun.spawn([
   "claude",
@@ -63,9 +69,11 @@ const exitCode = await claudeProcess.exited;
 const stdout = await new Response(claudeProcess.stdout).text();
 const stderr = await new Response(claudeProcess.stderr).text();
 
-console.log(stdout);
-if (stderr) {
-  console.error(stderr);
+if (argv.verbose) {
+  console.log(stdout);
+  if (stderr) {
+    console.error(stderr);
+  }
 }
 
 // Restore spec files for testing
@@ -73,7 +81,9 @@ for (const file of specFiles) {
   copyFileSync(join(inputDir, file), join(tempDir, file));
 }
 
-console.log(chalk.gray("  ✓ Agent execution completed"));
+if (argv.verbose) {
+  console.log(chalk.gray("  ✓ Agent execution completed"));
+}
 
 console.log(chalk.magenta("\n📊 Evaluation"));
 
