@@ -1,3 +1,36 @@
+## Repository Layout
+
+This is an **agent benchmarking system** for evaluating Claude Code's capabilities through automated tests.
+
+### Structure
+
+```
+agent-bench/
+├── .conductor/          # Multiple git worktree-based conductor environments
+│   ├── santiago/       # This conductor instance
+│   └── columbia/       # Other conductor instances
+├── evals/              # Evaluation test suites
+│   └── 000-simple-math/
+│       ├── input/      # Starting files (stubs) given to the agent
+│       ├── expected/   # Reference correct implementation
+│       ├── prompt.md   # Task description for Claude
+│       ├── evaluateClaudeCode.ts  # Main evaluation runner
+│       └── checkExpected.ts       # Verification script
+└── .github/workflows/  # CI/CD automation
+```
+
+### How Evaluations Work
+
+Each evaluation tests Claude Code's ability to complete a coding task:
+
+1. **prompt.md** - Contains the task description
+2. **input/** - Starting files (usually stubs) that the agent modifies
+3. **expected/** - Reference implementation showing the correct solution
+4. **evaluateClaudeCode.ts** - Runs Claude Code with the prompt, then runs tests
+5. **checkExpected.ts** - Verifies the expected implementation passes tests
+
+The evaluation runner creates a temp directory, invokes Claude Code, runs tests against the modified files, and reports pass/fail based on test results.
+
 ## Autonomous Work Preferences
 
 The user prefers agents to work autonomously with the following workflow:
