@@ -1,3 +1,16 @@
+## Repository Layout
+
+Agent benchmarking system for testing Claude Code. Evaluations live in `evals/` directory.
+
+Each eval contains:
+- `prompt.md` - Task description
+- `input/` - Starting files for the agent
+- `expected/` - Reference implementation
+- `evaluateClaudeCode.ts` - Runs the evaluation on Claude Code
+- `checkExpected.ts` - Verifies the expected implementation works correctly
+
+**Important**: If the repository structure or eval conventions change, update this CLAUDE.md file to reflect those changes.
+
 ## Autonomous Work Preferences
 
 The user prefers agents to work autonomously with the following workflow:
