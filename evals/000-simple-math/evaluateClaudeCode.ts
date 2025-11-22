@@ -2,6 +2,7 @@ import { copyFileSync, mkdirSync, rmSync, readdirSync, readFileSync } from "node
 import { join } from "node:path";
 import yargs from "yargs";
 import { hideBin } from "yargs/helpers";
+import chalk from "chalk";
 
 const argv = yargs(hideBin(process.argv))
   .option("prelude", {
@@ -26,8 +27,7 @@ const promptFile = join(import.meta.dir, "prompt.md");
 
 const prelude = argv.prelude;
 
-console.log("\n🔧 SETUP");
-console.log("─────────────────────────────────────");
+console.log(chalk.cyan("\n🔧 Setup"));
 
 rmSync(tempDir, { recursive: true, force: true });
 mkdirSync(tempDir, { recursive: true });
@@ -41,12 +41,11 @@ const specFiles = inputFiles.filter(file => file.endsWith(".spec.ts"));
 const prompt = readFileSync(promptFile, "utf-8").trim();
 const fullPrompt = `${prelude}\n\nHere are your instructions:\n\n${prompt}`;
 
-console.log("✓ Created temp directory");
-console.log(`✓ Copied ${inputFiles.length} input files`);
-console.log("✓ Loaded prompt");
+console.log(chalk.gray("  ✓ Created temp directory"));
+console.log(chalk.gray(`  ✓ Copied ${inputFiles.length} input files`));
+console.log(chalk.gray("  ✓ Loaded prompt"));
 
-console.log("\n🤖 RUN AGENT");
-console.log("─────────────────────────────────────");
+console.log(chalk.blue("\n🤖 Run Agent"));
 
 const claudeProcess = Bun.spawn([
   "claude",
@@ -74,10 +73,9 @@ for (const file of specFiles) {
   copyFileSync(join(inputDir, file), join(tempDir, file));
 }
 
-console.log("✓ Agent execution completed");
+console.log(chalk.gray("  ✓ Agent execution completed"));
 
-console.log("\n📊 EVALUATION");
-console.log("─────────────────────────────────────");
+console.log(chalk.magenta("\n📊 Evaluation"));
 
 // Run visible tests
 const testProcess = Bun.spawn(["bun", "test", tempDir], {
@@ -94,7 +92,7 @@ const testStderr = await new Response(testProcess.stderr).text();
 const visibleTestsPassed = testExitCode === 0;
 
 if (!visibleTestsPassed) {
-  console.log("✗ Visible tests: FAILED");
+  console.log(chalk.red("  ✗ Visible tests: FAILED"));
   if (argv.verbose) {
     console.log("\nTest output:");
     console.log(testStdout);
@@ -104,10 +102,10 @@ if (!visibleTestsPassed) {
   }
 
   rmSync(tempDir, { recursive: true, force: true });
-  console.log("\n❌ EVALUATION FAILED");
+  console.log(chalk.red.bold("\n❌ Evaluation Failed"));
   process.exit(testExitCode);
 } else {
-  console.log("✓ Visible tests: PASSED");
+  console.log(chalk.green("  ✓ Visible tests: PASSED"));
 }
 
 // Run hidden tests
@@ -124,7 +122,7 @@ const hiddenTestStderr = await new Response(hiddenTestProcess.stderr).text();
 const hiddenTestsPassed = hiddenTestExitCode === 0;
 
 if (!hiddenTestsPassed) {
-  console.log("✗ Hidden tests: FAILED");
+  console.log(chalk.red("  ✗ Hidden tests: FAILED"));
   if (argv.verbose) {
     console.log("\nTest output:");
     console.log(hiddenTestStdout);
@@ -133,18 +131,17 @@ if (!hiddenTestsPassed) {
     }
   }
 } else {
-  console.log("✓ Hidden tests: PASSED");
+  console.log(chalk.green("  ✓ Hidden tests: PASSED"));
 }
 
 // Cleanup
 rmSync(tempDir, { recursive: true, force: true });
 
 // Final result
-console.log("\n─────────────────────────────────────");
 if (visibleTestsPassed && hiddenTestsPassed) {
-  console.log("✅ EVALUATION PASSED");
+  console.log(chalk.green.bold("\n✅ Evaluation Passed"));
   process.exit(0);
 } else {
-  console.log("❌ EVALUATION FAILED");
+  console.log(chalk.red.bold("\n❌ Evaluation Failed"));
   process.exit(1);
 }
