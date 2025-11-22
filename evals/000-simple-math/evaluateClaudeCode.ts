@@ -20,24 +20,35 @@ const promptFile = join(import.meta.dir, "prompt.md");
 
 const prelude = argv.prelude;
 
-console.log("Creating temp directory...");
+// =====================================
+// 🔧 SETUP PHASE
+// =====================================
+console.log("\n🔧 SETUP");
+console.log("─────────────────────────────────────");
+
 rmSync(tempDir, { recursive: true, force: true });
 mkdirSync(tempDir, { recursive: true });
 
-console.log("Copying input files to temp...");
 const inputFiles = readdirSync(inputDir);
 for (const file of inputFiles) {
   copyFileSync(join(inputDir, file), join(tempDir, file));
 }
 
-// Track spec files for later restoration
 const specFiles = inputFiles.filter(file => file.endsWith(".spec.ts"));
-
-console.log("Reading prompt...");
 const prompt = readFileSync(promptFile, "utf-8").trim();
 const fullPrompt = `${prelude}\n\nHere are your instructions:\n\n${prompt}`;
 
-console.log("\nInvoking Claude Code...");
+console.log("✓ Created temp directory");
+console.log(`✓ Copied ${inputFiles.length} input files`);
+console.log("✓ Loaded prompt");
+
+// =====================================
+// 🤖 PERFORM PHASE
+// =====================================
+console.log("\n🤖 PERFORM");
+console.log("─────────────────────────────────────");
+console.log("Running Claude Code agent...\n");
+
 const claudeProcess = Bun.spawn([
   "claude",
   "--print",
@@ -54,50 +65,86 @@ const exitCode = await claudeProcess.exited;
 const stdout = await new Response(claudeProcess.stdout).text();
 const stderr = await new Response(claudeProcess.stderr).text();
 
-console.log("\n=== Claude Code Output ===");
 console.log(stdout);
 if (stderr) {
-  console.log("\n=== Stderr ===");
-  console.log(stderr);
+  console.error(stderr);
 }
 
-console.log("\n=== Restoring spec files from input directory ===");
+// Restore spec files for testing
 for (const file of specFiles) {
   copyFileSync(join(inputDir, file), join(tempDir, file));
 }
 
-console.log("\n=== Running all spec files to verify implementation ===");
+console.log("✓ Agent execution completed");
+
+// =====================================
+// 📊 EVALUATION PHASE
+// =====================================
+console.log("\n📊 EVALUATION");
+console.log("─────────────────────────────────────");
+
+// Run visible tests
 const testProcess = Bun.spawn(["bun", "test", tempDir], {
   cwd: import.meta.dir,
-  stdout: "inherit",
-  stderr: "inherit",
+  stdout: "pipe",
+  stderr: "pipe",
 });
 
 const testExitCode = await testProcess.exited;
+const testStdout = await new Response(testProcess.stdout).text();
+const testStderr = await new Response(testProcess.stderr).text();
 
-if (testExitCode !== 0) {
-  console.log("\nCleaning up...");
+// Parse test results
+const visibleTestsPassed = testExitCode === 0;
+
+if (!visibleTestsPassed) {
+  console.log("✗ Visible tests: FAILED");
+  console.log("\nTest output:");
+  console.log(testStdout);
+  if (testStderr) {
+    console.error(testStderr);
+  }
+
   rmSync(tempDir, { recursive: true, force: true });
-  console.log("\n❌ EVALUATION FAILED: Tests did not pass");
+  console.log("\n❌ EVALUATION FAILED");
   process.exit(testExitCode);
+} else {
+  console.log("✓ Visible tests: PASSED");
 }
 
-console.log("\n=== Running hidden tests ===");
+// Run hidden tests
 const hiddenTestProcess = Bun.spawn(["bun", "test", "math.hidden.spec.ts"], {
   cwd: import.meta.dir,
-  stdout: "inherit",
-  stderr: "inherit",
+  stdout: "pipe",
+  stderr: "pipe",
 });
 
 const hiddenTestExitCode = await hiddenTestProcess.exited;
+const hiddenTestStdout = await new Response(hiddenTestProcess.stdout).text();
+const hiddenTestStderr = await new Response(hiddenTestProcess.stderr).text();
 
-console.log("\nCleaning up...");
-rmSync(tempDir, { recursive: true, force: true });
+const hiddenTestsPassed = hiddenTestExitCode === 0;
 
-if (hiddenTestExitCode === 0) {
-  console.log("\n✅ EVALUATION PASSED: All tests passing (including hidden tests)");
+if (!hiddenTestsPassed) {
+  console.log("✗ Hidden tests: FAILED");
+  console.log("\nTest output:");
+  console.log(hiddenTestStdout);
+  if (hiddenTestStderr) {
+    console.error(hiddenTestStderr);
+  }
 } else {
-  console.log("\n❌ EVALUATION FAILED: Hidden tests did not pass");
+  console.log("✓ Hidden tests: PASSED");
 }
 
-process.exit(hiddenTestExitCode);
+// Cleanup
+rmSync(tempDir, { recursive: true, force: true });
+
+// Final result
+console.log("\n─────────────────────────────────────");
+if (visibleTestsPassed && hiddenTestsPassed) {
+  console.log("✅ EVALUATION PASSED");
+  process.exit(0);
+} else {
+  console.log("❌ EVALUATION FAILED");
+  process.exit(1);
+}
