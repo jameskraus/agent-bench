@@ -9,6 +9,8 @@ Each eval contains:
 - `evaluateClaudeCode.ts` - Runner script
 - `checkExpected.ts` - Verification script
 
+**Important**: If the repository structure or eval conventions change, update this CLAUDE.md file to reflect those changes.
+
 ## Autonomous Work Preferences
 
 The user prefers agents to work autonomously with the following workflow:
