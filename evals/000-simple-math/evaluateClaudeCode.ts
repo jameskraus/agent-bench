@@ -1,8 +1,9 @@
-import { copyFileSync, mkdirSync, rmSync, readdirSync } from "node:fs";
+import { copyFileSync, mkdirSync, rmSync, readdirSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 
 const tempDir = join(import.meta.dir, "temp");
 const inputDir = join(import.meta.dir, "input");
+const promptFile = join(import.meta.dir, "prompt.md");
 
 console.log("Creating temp directory...");
 rmSync(tempDir, { recursive: true, force: true });
@@ -17,13 +18,16 @@ for (const file of inputFiles) {
 // Track spec files for later restoration
 const specFiles = inputFiles.filter(file => file.endsWith(".spec.ts"));
 
+console.log("Reading prompt from prompt.md...");
+const prompt = readFileSync(promptFile, "utf-8").trim();
+
 console.log("\nInvoking Claude Code to implement math.ts...");
 const claudeProcess = Bun.spawn([
   "claude",
   "--print",
   "--dangerously-skip-permissions",
   "--output-format", "text",
-  "Please implement the functions in math.ts. The file currently has stub implementations that return undefined. You need to implement add, subtract, multiply, and divide functions. For divide, make sure to return undefined when dividing by zero. Run all the spec files to verify your implementation is correct."
+  prompt
 ], {
   cwd: tempDir,
   stdout: "pipe",

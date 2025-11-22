@@ -1,0 +1,1 @@
+Please implement the functions in math.ts. The file currently has stub implementations that return undefined. You need to implement add, subtract, multiply, and divide functions. For divide, make sure to return undefined when dividing by zero. Run all the spec files to verify your implementation is correct.
