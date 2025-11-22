@@ -40,3 +40,5 @@ test("hello world", () => {
   expect(1).toBe(1);
 });
 ```
+
+For more information, read the Bun API docs in `node_modules/bun-types/docs/**.md`.
