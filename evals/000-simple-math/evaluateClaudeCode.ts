@@ -1,11 +1,24 @@
 import { copyFileSync, mkdirSync, rmSync, readdirSync, readFileSync } from "node:fs";
 import { join } from "node:path";
+import yargs from "yargs";
+import { hideBin } from "yargs/helpers";
+
+const argv = yargs(hideBin(process.argv))
+  .option("prelude", {
+    alias: "p",
+    type: "string",
+    description: "Custom prelude text to prepend to the prompt",
+    default: "Complete the following task to the best of your abilities.",
+  })
+  .help()
+  .alias("help", "h")
+  .parseSync();
 
 const tempDir = join(import.meta.dir, "temp");
 const inputDir = join(import.meta.dir, "input");
 const promptFile = join(import.meta.dir, "prompt.md");
 
-const prelude = "Complete the following task to the best of your abilities.";
+const prelude = argv.prelude;
 
 console.log("Creating temp directory...");
 rmSync(tempDir, { recursive: true, force: true });
