@@ -62,13 +62,29 @@ const testProcess = Bun.spawn(["bun", "test", tempDir], {
 
 const testExitCode = await testProcess.exited;
 
+if (testExitCode !== 0) {
+  console.log("\nCleaning up...");
+  rmSync(tempDir, { recursive: true, force: true });
+  console.log("\n❌ EVALUATION FAILED: Tests did not pass");
+  process.exit(testExitCode);
+}
+
+console.log("\n=== Running hidden tests ===");
+const hiddenTestProcess = Bun.spawn(["bun", "test", "math.hidden.spec.ts"], {
+  cwd: import.meta.dir,
+  stdout: "inherit",
+  stderr: "inherit",
+});
+
+const hiddenTestExitCode = await hiddenTestProcess.exited;
+
 console.log("\nCleaning up...");
 rmSync(tempDir, { recursive: true, force: true });
 
-if (testExitCode === 0) {
-  console.log("\n✅ EVALUATION PASSED: All tests passing");
+if (hiddenTestExitCode === 0) {
+  console.log("\n✅ EVALUATION PASSED: All tests passing (including hidden tests)");
 } else {
-  console.log("\n❌ EVALUATION FAILED: Tests did not pass");
+  console.log("\n❌ EVALUATION FAILED: Hidden tests did not pass");
 }
 
-process.exit(testExitCode);
+process.exit(hiddenTestExitCode);
