@@ -2,11 +2,11 @@
 
 The user prefers agents to work autonomously with the following workflow:
 
-- When working on a new branch, always open a PR on GitHub as soon as meaningful work begins
-- Regularly push commits to GitHub to keep the remote branch up to date
+- **ALWAYS** open a PR on GitHub immediately when starting work on a new branch - do not wait
+- **ALWAYS** commit changes after every meaningful change - never ask for permission to commit
+- **ALWAYS** push commits to GitHub regularly to keep the remote branch up to date
 - Work proactively without requiring excessive confirmation for standard development tasks
-- Keep the PR updated as work progresses
-- Never ask for permission to commit changes - always commit changes automatically when work is complete
+- Keep the PR updated as work progresses with regular commits and pushes
 
 ## Bun Runtime
 
