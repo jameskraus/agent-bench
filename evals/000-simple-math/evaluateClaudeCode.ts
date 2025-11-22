@@ -3,6 +3,7 @@ import { join } from "node:path";
 
 const tempDir = join(import.meta.dir, "temp");
 const inputDir = join(import.meta.dir, "input");
+const preludeFile = join(import.meta.dir, "prelude.md");
 const promptFile = join(import.meta.dir, "prompt.md");
 
 console.log("Creating temp directory...");
@@ -18,8 +19,10 @@ for (const file of inputFiles) {
 // Track spec files for later restoration
 const specFiles = inputFiles.filter(file => file.endsWith(".spec.ts"));
 
-console.log("Reading prompt from prompt.md...");
+console.log("Reading prelude and prompt...");
+const prelude = readFileSync(preludeFile, "utf-8").trim();
 const prompt = readFileSync(promptFile, "utf-8").trim();
+const fullPrompt = `${prelude}\n\n${prompt}`;
 
 console.log("\nInvoking Claude Code...");
 const claudeProcess = Bun.spawn([
@@ -27,7 +30,7 @@ const claudeProcess = Bun.spawn([
   "--print",
   "--dangerously-skip-permissions",
   "--output-format", "text",
-  prompt
+  fullPrompt
 ], {
   cwd: tempDir,
   stdout: "pipe",
