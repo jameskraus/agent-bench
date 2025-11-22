@@ -3,8 +3,9 @@ import { join } from "node:path";
 
 const tempDir = join(import.meta.dir, "temp");
 const inputDir = join(import.meta.dir, "input");
-const preludeFile = join(import.meta.dir, "prelude.md");
 const promptFile = join(import.meta.dir, "prompt.md");
+
+const prelude = "Complete the following task to the best of your abilities.";
 
 console.log("Creating temp directory...");
 rmSync(tempDir, { recursive: true, force: true });
@@ -19,8 +20,7 @@ for (const file of inputFiles) {
 // Track spec files for later restoration
 const specFiles = inputFiles.filter(file => file.endsWith(".spec.ts"));
 
-console.log("Reading prelude and prompt...");
-const prelude = readFileSync(preludeFile, "utf-8").trim();
+console.log("Reading prompt...");
 const prompt = readFileSync(promptFile, "utf-8").trim();
 const fullPrompt = `${prelude}\n\nHere are your instructions:\n\n${prompt}`;
 
