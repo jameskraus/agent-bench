@@ -63,7 +63,7 @@ console.log("\nCleaning up...");
 rmSync(tempDir, { recursive: true, force: true });
 
 if (testExitCode === 0) {
-  console.log("\n✅ EVALUATION PASSED: Claude Code successfully implemented math.ts");
+  console.log("\n✅ EVALUATION PASSED: All tests passing");
 } else {
   console.log("\n❌ EVALUATION FAILED: Tests did not pass");
 }
