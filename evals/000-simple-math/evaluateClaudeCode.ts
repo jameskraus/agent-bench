@@ -20,9 +20,6 @@ const promptFile = join(import.meta.dir, "prompt.md");
 
 const prelude = argv.prelude;
 
-// =====================================
-// 🔧 SETUP PHASE
-// =====================================
 console.log("\n🔧 SETUP");
 console.log("─────────────────────────────────────");
 
@@ -42,9 +39,6 @@ console.log("✓ Created temp directory");
 console.log(`✓ Copied ${inputFiles.length} input files`);
 console.log("✓ Loaded prompt");
 
-// =====================================
-// 🤖 PERFORM PHASE
-// =====================================
 console.log("\n🤖 PERFORM");
 console.log("─────────────────────────────────────");
 console.log("Running Claude Code agent...\n");
@@ -77,9 +71,6 @@ for (const file of specFiles) {
 
 console.log("✓ Agent execution completed");
 
-// =====================================
-// 📊 EVALUATION PHASE
-// =====================================
 console.log("\n📊 EVALUATION");
 console.log("─────────────────────────────────────");
 
