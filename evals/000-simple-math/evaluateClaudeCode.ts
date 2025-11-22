@@ -10,6 +10,12 @@ const argv = yargs(hideBin(process.argv))
     description: "Custom prelude text to prepend to the prompt",
     default: "Complete the following task to the best of your abilities.",
   })
+  .option("verbose", {
+    alias: "v",
+    type: "boolean",
+    description: "Show detailed test output on failure",
+    default: false,
+  })
   .help()
   .alias("help", "h")
   .parseSync();
@@ -89,10 +95,12 @@ const visibleTestsPassed = testExitCode === 0;
 
 if (!visibleTestsPassed) {
   console.log("✗ Visible tests: FAILED");
-  console.log("\nTest output:");
-  console.log(testStdout);
-  if (testStderr) {
-    console.error(testStderr);
+  if (argv.verbose) {
+    console.log("\nTest output:");
+    console.log(testStdout);
+    if (testStderr) {
+      console.error(testStderr);
+    }
   }
 
   rmSync(tempDir, { recursive: true, force: true });
@@ -117,10 +125,12 @@ const hiddenTestsPassed = hiddenTestExitCode === 0;
 
 if (!hiddenTestsPassed) {
   console.log("✗ Hidden tests: FAILED");
-  console.log("\nTest output:");
-  console.log(hiddenTestStdout);
-  if (hiddenTestStderr) {
-    console.error(hiddenTestStderr);
+  if (argv.verbose) {
+    console.log("\nTest output:");
+    console.log(hiddenTestStdout);
+    if (hiddenTestStderr) {
+      console.error(hiddenTestStderr);
+    }
   }
 } else {
   console.log("✓ Hidden tests: PASSED");
