@@ -66,8 +66,8 @@ const claudeProcess = Bun.spawn([
 });
 
 const exitCode = await claudeProcess.exited;
-const stdout = await new Response(claudeProcess.stdout).text();
-const stderr = await new Response(claudeProcess.stderr).text();
+const stdout = await Bun.readableStreamToText(claudeProcess.stdout);
+const stderr = await Bun.readableStreamToText(claudeProcess.stderr);
 
 if (argv.verbose) {
   console.log(stdout);
@@ -95,8 +95,8 @@ const testProcess = Bun.spawn(["bun", "test", tempDir], {
 });
 
 const testExitCode = await testProcess.exited;
-const testStdout = await new Response(testProcess.stdout).text();
-const testStderr = await new Response(testProcess.stderr).text();
+const testStdout = await Bun.readableStreamToText(testProcess.stdout);
+const testStderr = await Bun.readableStreamToText(testProcess.stderr);
 
 // Parse test results
 const visibleTestsPassed = testExitCode === 0;
@@ -126,8 +126,8 @@ const hiddenTestProcess = Bun.spawn(["bun", "test", "math.hidden.spec.ts"], {
 });
 
 const hiddenTestExitCode = await hiddenTestProcess.exited;
-const hiddenTestStdout = await new Response(hiddenTestProcess.stdout).text();
-const hiddenTestStderr = await new Response(hiddenTestProcess.stderr).text();
+const hiddenTestStdout = await Bun.readableStreamToText(hiddenTestProcess.stdout);
+const hiddenTestStderr = await Bun.readableStreamToText(hiddenTestProcess.stderr);
 
 const hiddenTestsPassed = hiddenTestExitCode === 0;
 
