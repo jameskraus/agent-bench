@@ -1,0 +1,19 @@
+{
+	"name": "postcss-styled-syntax",
+	"version": "0.7.1",
+	"description": "PostCSS syntax for template literals CSS-in-JS (e. g. styled-components).",
+	"main": "lib/index.js",
+	"scripts": {
+		"test": "jest"
+	},
+	"dependencies": {
+		"typescript": "^5.7.3"
+	},
+	"peerDependencies": {
+		"postcss": "^8.5.1"
+	},
+	"devDependencies": {
+		"jest": "^29.7.0",
+		"postcss": "^8.5.1"
+	}
+}
