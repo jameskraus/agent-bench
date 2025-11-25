@@ -1,5 +1,5 @@
 import { test, expect } from "bun:test";
-import { add, subtract, multiply, divide } from "./temp/math";
+import { add, subtract, multiply, divide } from "./math";
 
 test("add handles negative numbers", () => {
   expect(add(-5, -3)).toBe(-8);

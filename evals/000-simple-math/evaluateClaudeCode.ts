@@ -35,17 +35,20 @@ rmSync(tempDir, { recursive: true, force: true });
 mkdirSync(tempDir, { recursive: true });
 
 const inputFiles = readdirSync(inputDir);
-for (const file of inputFiles) {
+const hiddenSpecFiles = inputFiles.filter(file => file.includes(".hidden.spec.ts"));
+const visibleFiles = inputFiles.filter(file => !file.includes(".hidden.spec.ts"));
+
+for (const file of visibleFiles) {
   copyFileSync(join(inputDir, file), join(tempDir, file));
 }
 
-const specFiles = inputFiles.filter(file => file.endsWith(".spec.ts"));
+const specFiles = visibleFiles.filter(file => file.endsWith(".spec.ts"));
 const prompt = readFileSync(promptFile, "utf-8").trim();
 const fullPrompt = `${prelude}\n\nHere are your instructions:\n\n${prompt}`;
 
 if (argv.verbose) {
   console.log(chalk.gray("  ✓ Created temp directory"));
-  console.log(chalk.gray(`  ✓ Copied ${inputFiles.length} input files`));
+  console.log(chalk.gray(`  ✓ Copied ${visibleFiles.length} visible input files`));
   console.log(chalk.gray("  ✓ Loaded prompt"));
 }
 
@@ -118,9 +121,14 @@ if (!visibleTestsPassed) {
   console.log(chalk.green("  ✓ Visible tests: PASSED"));
 }
 
+// Copy hidden spec files for testing
+for (const file of hiddenSpecFiles) {
+  copyFileSync(join(inputDir, file), join(tempDir, file));
+}
+
 // Run hidden tests
 const hiddenTestProcess = Bun.spawn(["bun", "test", "math.hidden.spec.ts"], {
-  cwd: import.meta.dir,
+  cwd: tempDir,
   stdout: "pipe",
   stderr: "pipe",
 });
