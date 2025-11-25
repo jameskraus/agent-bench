@@ -1,15 +1,10 @@
 # agent-bench
 
-To install dependencies:
+A benchmarking suite for evaluating coding agents against standardized tasks. Each evaluation in `evals/` includes a task prompt, starting files, and expected outputs.
+
+## Setup
 
 ```bash
 bun install
+bun run evals/000-simple-math/evaluateClaudeCode.ts
 ```
-
-To run:
-
-```bash
-bun run index.ts
-```
-
-This project was created using `bun init` in bun v1.3.1. [Bun](https://bun.com) is a fast all-in-one JavaScript runtime.
