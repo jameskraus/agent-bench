@@ -1,4 +1,4 @@
-import { copyFileSync, mkdirSync, rmSync, readdirSync, readFileSync, cpSync } from "node:fs";
+import { copyFileSync, mkdirSync, rmSync, readdirSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import yargs from "yargs";
 import { hideBin } from "yargs/helpers";
@@ -25,8 +25,6 @@ const tempDir = join(import.meta.dir, "temp");
 const inputDir = join(import.meta.dir, "input");
 const promptFile = join(import.meta.dir, "prompt.md");
 
-const prelude = argv.prelude;
-
 if (argv.verbose) {
   console.log(chalk.cyan("\n🔧 Setup"));
 }
@@ -34,70 +32,40 @@ if (argv.verbose) {
 rmSync(tempDir, { recursive: true, force: true });
 mkdirSync(tempDir, { recursive: true });
 
-// Copy input directory recursively, excluding hidden test files
-function copyInputFiles(srcDir: string, destDir: string) {
+// Track hidden and visible test files while copying
+const hiddenTestFiles: string[] = [];
+const visibleTestFiles: string[] = [];
+
+function copyInputFiles(srcDir: string, destDir: string, relativeDir = "") {
   const entries = readdirSync(srcDir, { withFileTypes: true });
 
   for (const entry of entries) {
     const srcPath = join(srcDir, entry.name);
     const destPath = join(destDir, entry.name);
+    const relativePath = join(relativeDir, entry.name);
 
     if (entry.isDirectory()) {
       mkdirSync(destPath, { recursive: true });
-      copyInputFiles(srcPath, destPath);
-    } else if (!entry.name.includes(".hidden.")) {
-      // Skip hidden test files
+      copyInputFiles(srcPath, destPath, relativePath);
+    } else if (entry.name.includes(".hidden.")) {
+      hiddenTestFiles.push(relativePath);
+    } else {
       copyFileSync(srcPath, destPath);
+      if (entry.name.endsWith(".test.js")) {
+        visibleTestFiles.push(relativePath);
+      }
     }
   }
 }
 
 copyInputFiles(inputDir, tempDir);
 
-// Find all hidden test files
-function findHiddenTestFiles(dir: string, files: string[] = []): string[] {
-  const entries = readdirSync(dir, { withFileTypes: true });
-
-  for (const entry of entries) {
-    const fullPath = join(dir, entry.name);
-
-    if (entry.isDirectory()) {
-      findHiddenTestFiles(fullPath, files);
-    } else if (entry.name.includes(".hidden.")) {
-      files.push(fullPath);
-    }
-  }
-
-  return files;
-}
-
-const hiddenTestFiles = findHiddenTestFiles(inputDir);
-
-// Find all visible test files
-function findVisibleTestFiles(dir: string, files: string[] = []): string[] {
-  const entries = readdirSync(dir, { withFileTypes: true });
-
-  for (const entry of entries) {
-    const fullPath = join(dir, entry.name);
-
-    if (entry.isDirectory()) {
-      findVisibleTestFiles(fullPath, files);
-    } else if (entry.name.endsWith(".test.js") && !entry.name.includes(".hidden.")) {
-      files.push(fullPath);
-    }
-  }
-
-  return files;
-}
-
-const visibleTestFiles = findVisibleTestFiles(inputDir);
-
 const prompt = readFileSync(promptFile, "utf-8").trim();
-const fullPrompt = `${prelude}\n\nHere are your instructions:\n\n${prompt}`;
+const fullPrompt = `${argv.prelude}\n\nHere are your instructions:\n\n${prompt}`;
 
 if (argv.verbose) {
   console.log(chalk.gray("  ✓ Created temp directory"));
-  console.log(chalk.gray(`  ✓ Copied input files (excluding hidden tests)`));
+  console.log(chalk.gray("  ✓ Copied input files (excluding hidden tests)"));
   console.log(chalk.gray("  ✓ Loaded prompt"));
 }
 
@@ -130,7 +98,7 @@ const claudeProcess = Bun.spawn([
   stderr: "pipe",
 });
 
-const exitCode = await claudeProcess.exited;
+await claudeProcess.exited;
 const stdout = await Bun.readableStreamToText(claudeProcess.stdout);
 const stderr = await Bun.readableStreamToText(claudeProcess.stderr);
 
@@ -141,11 +109,9 @@ if (argv.verbose) {
   }
 }
 
-// Restore visible spec files for testing (in case agent modified them)
-for (const srcPath of visibleTestFiles) {
-  const relativePath = srcPath.replace(inputDir + "/", "");
-  const destPath = join(tempDir, relativePath);
-  copyFileSync(srcPath, destPath);
+// Restore visible test files (in case agent modified them)
+for (const relativePath of visibleTestFiles) {
+  copyFileSync(join(inputDir, relativePath), join(tempDir, relativePath));
 }
 
 if (argv.verbose) {
@@ -165,7 +131,6 @@ const testExitCode = await testProcess.exited;
 const testStdout = await Bun.readableStreamToText(testProcess.stdout);
 const testStderr = await Bun.readableStreamToText(testProcess.stderr);
 
-// Parse test results
 const visibleTestsPassed = testExitCode === 0;
 
 if (!visibleTestsPassed) {
@@ -185,14 +150,12 @@ if (!visibleTestsPassed) {
   console.log(chalk.green("  ✓ Visible tests: PASSED"));
 }
 
-// Copy hidden spec files for testing
-for (const srcPath of hiddenTestFiles) {
-  const relativePath = srcPath.replace(inputDir + "/", "");
-  const destPath = join(tempDir, relativePath.replace(".hidden.", "."));
-  copyFileSync(srcPath, destPath);
+// Copy hidden test files
+for (const relativePath of hiddenTestFiles) {
+  copyFileSync(join(inputDir, relativePath), join(tempDir, relativePath));
 }
 
-// Run hidden tests
+// Run all tests (now including hidden)
 const hiddenTestProcess = Bun.spawn(["npm", "test"], {
   cwd: tempDir,
   stdout: "pipe",

@@ -29,9 +29,7 @@ console.log("Copying input files to temp...");
 copyDir(inputDir, tempDir);
 
 console.log("Copying expected implementations...");
-copyFileSync(join(expectedDir, "lib", "tokenizer.js"), join(tempDir, "lib", "tokenizer.js"));
-copyFileSync(join(expectedDir, "lib", "parser.js"), join(tempDir, "lib", "parser.js"));
-copyFileSync(join(expectedDir, "lib", "stringifier.js"), join(tempDir, "lib", "stringifier.js"));
+copyDir(expectedDir, tempDir);
 
 console.log("\nInstalling dependencies...");
 const installProcess = Bun.spawn(["npm", "install"], {
