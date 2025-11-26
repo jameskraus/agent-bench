@@ -45,6 +45,7 @@ function copyInputFiles(srcDir: string, destDir: string, relativeDir = "") {
     const relativePath = join(relativeDir, entry.name);
 
     if (entry.isDirectory()) {
+      if (entry.name === "node_modules") continue;
       mkdirSync(destPath, { recursive: true });
       copyInputFiles(srcPath, destPath, relativePath);
     } else if (entry.name.includes(".hidden.")) {
