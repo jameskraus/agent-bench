@@ -14,7 +14,6 @@ describe('double-slash comments parsing', () => {
 
 		expect(comment.type).toBe('comment');
 		expect(comment.text).toBe('hello');
-		expect(comment.raws.inline).toBe(true);
 
 		expect(decl.prop).toBe('color');
 		expect(decl.value).toBe('red');
@@ -35,7 +34,6 @@ describe('double-slash comments parsing', () => {
 
 		expect(comment.type).toBe('comment');
 		expect(comment.text).toBe('hello');
-		expect(comment.raws.inline).toBe(true);
 
 		expect(decl.prop).toBe('border');
 		expect(decl.value).toBe('blue');

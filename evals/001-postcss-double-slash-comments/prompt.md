@@ -5,7 +5,7 @@ Currently, the parser only supports standard CSS block comments (`/* */`). You n
 ## Requirements
 
 1. The tokenizer (`lib/tokenizer.js`) should recognize `//` as the start of a comment that continues until the end of the line
-2. The parser (`lib/parser.js`) should handle these inline comments and create proper Comment nodes with `raws.inline = true`
+2. The parser (`lib/parser.js`) should handle these inline comments and create proper Comment nodes
 3. The stringifier (`lib/stringifier.js`) should output inline comments using `//` syntax (not wrapping them in `/* */`)
 4. Important: `//` in scheme-relative URLs like `url(//cdn.example.com/image.png)` should NOT be treated as comments
 
