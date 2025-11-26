@@ -165,6 +165,21 @@ class Stringifier extends PostCSSStringifier {
 	}
 
 	/**
+	 * @param {import("postcss").Comment} node
+	 */
+	comment(node) {
+		if (node.raws.inline) {
+			let left = this.raw(node, 'left', 'commentLeft');
+			let right = this.raw(node, 'right', 'commentRight');
+
+			this.builder('//' + left + node.text + right, node);
+			return;
+		}
+
+		super.comment(node);
+	}
+
+	/**
 	 * @param {string} str
 	 * @param {number} strEndOffset
 	 *

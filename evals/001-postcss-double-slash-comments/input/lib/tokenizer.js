@@ -28,7 +28,7 @@ const DOLLAR_SIGN = '$'.charCodeAt(0);
 // } STYLED PATCH
 
 const RE_AT_END = /[\t\n\f\r "#'()/;[\\\]{}]/g;
-const RE_WORD_END = /[\t\n\f\r !"#'():;@[\\\]{}]|\/(?=\*)/g;
+const RE_WORD_END = /[\t\n\f\r !"#'():;@[\\\]{}]|\/(?=[*/])/g;
 const RE_BAD_BRACKET = /.[\n"'(/\\]/;
 const RE_HEX_ESCAPE = /[\da-f]/i;
 
@@ -304,6 +304,38 @@ function tokenizer(input, options = {}) {
 						pos = next;
 					}
 					// } STYLED PATCH
+				} else if (code === SLASH && css.charCodeAt(pos + 1) === SLASH) {
+					// Check if this is a protocol (like http://) by looking at the previous character
+					let prevChar = pos > 0 ? css.charCodeAt(pos - 1) : 0;
+					if (prevChar === COLON) {
+						// This is likely a protocol like http://, not a comment
+						RE_WORD_END.lastIndex = pos + 1;
+						RE_WORD_END.test(css);
+
+						if (RE_WORD_END.lastIndex === 0) {
+							next = css.length - 1;
+						} else {
+							next = RE_WORD_END.lastIndex - 2;
+						}
+
+						currentToken = ['word', css.slice(pos, next + 1), pos, next];
+						buffer.push(currentToken);
+						pos = next;
+					} else {
+						// This is a // comment - find the end of the line
+						next = pos + 2;
+						while (
+							next < length &&
+							css.charCodeAt(next) !== NEWLINE &&
+							css.charCodeAt(next) !== CR &&
+							css.charCodeAt(next) !== FEED
+						) {
+							next++;
+						}
+
+						currentToken = ['comment', css.slice(pos, next), pos, next - 1];
+						pos = next - 1;
+					}
 				} else if (code === SLASH && css.charCodeAt(pos + 1) === ASTERISK) {
 					next = css.indexOf('*/', pos + 2) + 1;
 

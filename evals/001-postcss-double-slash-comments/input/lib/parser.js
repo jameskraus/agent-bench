@@ -1,7 +1,7 @@
 // @ts-nocheck
 'use strict';
 
-let { Declaration, Rule } = require('postcss');
+let { Comment, Declaration, Rule } = require('postcss');
 let PostCSSParser = require('postcss/lib/parser');
 let tokenizer = require('./tokenizer');
 
@@ -98,6 +98,35 @@ class Parser extends PostCSSParser {
 			this.endFile();
 		} catch (error) {
 			throw this.fixErrorPosition(error);
+		}
+	}
+
+	comment(token) {
+		let node = new Comment();
+		let isInlineComment = token[1].startsWith('//');
+		let text = isInlineComment ? token[1].slice(2) : token[1].slice(2, -2);
+
+		this.init(node, token[2]);
+		node.source.end = this.getPosition(token[3] || token[2]);
+
+		if (isInlineComment) {
+			node.raws.inline = true;
+		}
+
+		if (text.length > 0) {
+			let match = text.match(/^(\s*)([^]*\S)(\s*)$/);
+			if (match) {
+				let [, left, trimmed, right] = match;
+				node.text = trimmed;
+				node.raws.left = left;
+				node.raws.right = right;
+			} else {
+				node.text = '';
+				node.raws.left = text;
+				node.raws.right = '';
+			}
+		} else {
+			node.text = '';
 		}
 	}
 
