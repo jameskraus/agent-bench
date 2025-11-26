@@ -1,4 +1,4 @@
-import { copyFileSync, mkdirSync, rmSync, readdirSync, readFileSync } from "node:fs";
+import { copyFileSync, mkdirSync, rmSync, readdirSync } from "node:fs";
 import { join } from "node:path";
 
 const tempDir = join(import.meta.dir, "temp");
@@ -9,19 +9,25 @@ console.log("Creating temp directory...");
 rmSync(tempDir, { recursive: true, force: true });
 mkdirSync(tempDir, { recursive: true });
 
-// Copy entire input directory to temp
+// Copy entire input directory to temp, renaming hidden test files
 function copyDir(srcDir: string, destDir: string) {
   const entries = readdirSync(srcDir, { withFileTypes: true });
 
   for (const entry of entries) {
     const srcPath = join(srcDir, entry.name);
-    const destPath = join(destDir, entry.name);
+    let destName = entry.name;
+
+    // Rename hidden test files to regular test files
+    if (entry.name.includes(".hidden.")) {
+      destName = entry.name.replace(".hidden.", ".");
+    }
+
+    const destPath = join(destDir, destName);
 
     if (entry.isDirectory()) {
       mkdirSync(destPath, { recursive: true });
       copyDir(srcPath, destPath);
-    } else if (!entry.name.includes(".hidden.")) {
-      // Skip hidden test files initially
+    } else {
       copyFileSync(srcPath, destPath);
     }
   }
@@ -35,26 +41,6 @@ console.log("Copying expected implementations...");
 copyFileSync(join(expectedDir, "lib", "tokenizer.js"), join(tempDir, "lib", "tokenizer.js"));
 copyFileSync(join(expectedDir, "lib", "parser.js"), join(tempDir, "lib", "parser.js"));
 copyFileSync(join(expectedDir, "lib", "stringifier.js"), join(tempDir, "lib", "stringifier.js"));
-
-// Copy hidden test files (renaming to remove .hidden.)
-function copyHiddenTests(srcDir: string, destDir: string) {
-  const entries = readdirSync(srcDir, { withFileTypes: true });
-
-  for (const entry of entries) {
-    const srcPath = join(srcDir, entry.name);
-    const destPath = join(destDir, entry.name);
-
-    if (entry.isDirectory()) {
-      copyHiddenTests(srcPath, destPath);
-    } else if (entry.name.includes(".hidden.")) {
-      const newName = entry.name.replace(".hidden.", ".");
-      copyFileSync(srcPath, join(destDir, newName));
-    }
-  }
-}
-
-console.log("Copying hidden test files...");
-copyHiddenTests(inputDir, tempDir);
 
 // Install dependencies
 console.log("\nInstalling dependencies...");
