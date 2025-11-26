@@ -9,20 +9,12 @@ console.log("Creating temp directory...");
 rmSync(tempDir, { recursive: true, force: true });
 mkdirSync(tempDir, { recursive: true });
 
-// Copy entire input directory to temp, renaming hidden test files
 function copyDir(srcDir: string, destDir: string) {
   const entries = readdirSync(srcDir, { withFileTypes: true });
 
   for (const entry of entries) {
     const srcPath = join(srcDir, entry.name);
-    let destName = entry.name;
-
-    // Rename hidden test files to regular test files
-    if (entry.name.includes(".hidden.")) {
-      destName = entry.name.replace(".hidden.", ".");
-    }
-
-    const destPath = join(destDir, destName);
+    const destPath = join(destDir, entry.name);
 
     if (entry.isDirectory()) {
       mkdirSync(destPath, { recursive: true });
@@ -36,13 +28,11 @@ function copyDir(srcDir: string, destDir: string) {
 console.log("Copying input files to temp...");
 copyDir(inputDir, tempDir);
 
-// Copy expected implementations (overwriting the before-state files)
 console.log("Copying expected implementations...");
 copyFileSync(join(expectedDir, "lib", "tokenizer.js"), join(tempDir, "lib", "tokenizer.js"));
 copyFileSync(join(expectedDir, "lib", "parser.js"), join(tempDir, "lib", "parser.js"));
 copyFileSync(join(expectedDir, "lib", "stringifier.js"), join(tempDir, "lib", "stringifier.js"));
 
-// Install dependencies
 console.log("\nInstalling dependencies...");
 const installProcess = Bun.spawn(["npm", "install"], {
   cwd: tempDir,
