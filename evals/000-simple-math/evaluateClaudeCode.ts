@@ -1,5 +1,6 @@
 import { copyFileSync, mkdirSync, rmSync, readdirSync, readFileSync } from "node:fs";
 import { join } from "node:path";
+import { tmpdir } from "node:os";
 import yargs from "yargs";
 import { hideBin } from "yargs/helpers";
 import chalk from "chalk";
@@ -21,7 +22,7 @@ const argv = yargs(hideBin(process.argv))
   .alias("help", "h")
   .parseSync();
 
-const tempDir = join(import.meta.dir, `temp-${crypto.randomUUID()}`);
+const tempDir = join(tmpdir(), `agent-bench-eval-${crypto.randomUUID()}`);
 const inputDir = join(import.meta.dir, "input");
 const promptFile = join(import.meta.dir, "prompt.md");
 
