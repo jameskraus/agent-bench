@@ -30,6 +30,8 @@ if (argv.verbose) {
   console.log(chalk.cyan("\n🔧 Setup"));
 }
 
+console.log(chalk.gray(`Temp directory: ${tempDir}`));
+
 rmSync(tempDir, { recursive: true, force: true });
 mkdirSync(tempDir, { recursive: true });
 
