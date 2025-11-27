@@ -3,7 +3,7 @@ import { join } from "node:path";
 
 const tempDir = join(import.meta.dir, "temp");
 
-console.log("Creating temp directory...");
+console.log(`Creating temp directory: ${tempDir}`);
 mkdirSync(tempDir, { recursive: true });
 
 console.log("Copying files to temp...");

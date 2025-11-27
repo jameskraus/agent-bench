@@ -53,7 +53,7 @@ const prompt = readFileSync(promptFile, "utf-8").trim();
 const fullPrompt = `${prelude}\n\nHere are your instructions:\n\n${prompt}`;
 
 if (argv.verbose) {
-  console.log(chalk.gray("  ✓ Created temp directory"));
+  console.log(chalk.gray(`  ✓ Created temp directory: ${tempDir}`));
   console.log(chalk.gray(`  ✓ Copied ${visibleFiles.length} visible input files`));
   console.log(chalk.gray("  ✓ Loaded prompt"));
 }

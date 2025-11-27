@@ -5,7 +5,7 @@ const tempDir = join(import.meta.dir, "temp");
 const inputDir = join(import.meta.dir, "input");
 const expectedDir = join(import.meta.dir, "expected");
 
-console.log("Creating temp directory...");
+console.log(`Creating temp directory: ${tempDir}`);
 rmSync(tempDir, { recursive: true, force: true });
 mkdirSync(tempDir, { recursive: true });
 
