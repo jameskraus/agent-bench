@@ -18,6 +18,11 @@ const argv = yargs(hideBin(process.argv))
     description: "Show detailed test output on failure",
     default: false,
   })
+  .option("model", {
+    alias: "m",
+    type: "string",
+    description: "Claude model to use (full model ID, e.g., claude-sonnet-4-5-20250514)",
+  })
   .help()
   .alias("help", "h")
   .parseSync();
@@ -86,15 +91,25 @@ await installProcess.exited;
 
 if (argv.verbose) {
   console.log(chalk.blue("\n🤖 Run Agent"));
+  if (argv.model) {
+    console.log(chalk.gray(`  Using model: ${argv.model}`));
+  }
 }
 
-const claudeProcess = Bun.spawn([
+const claudeArgs = [
   "claude",
   "--print",
   "--dangerously-skip-permissions",
   "--output-format", "text",
-  fullPrompt
-], {
+];
+
+if (argv.model) {
+  claudeArgs.push("--model", argv.model);
+}
+
+claudeArgs.push(fullPrompt);
+
+const claudeProcess = Bun.spawn(claudeArgs, {
   cwd: tempDir,
   stdout: "pipe",
   stderr: "pipe",
