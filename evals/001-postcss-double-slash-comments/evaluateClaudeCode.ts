@@ -21,7 +21,7 @@ const argv = yargs(hideBin(process.argv))
   .option("model", {
     alias: "m",
     type: "string",
-    description: "Claude model to use (e.g., opus, sonnet, haiku, or full model ID)",
+    description: "Claude model to use (full model ID, e.g., claude-sonnet-4-5-20250514)",
   })
   .help()
   .alias("help", "h")
