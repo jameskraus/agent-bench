@@ -51,8 +51,6 @@ if (argv.verbose) {
   console.log(chalk.gray(`  ✓ Created temp directory: ${tempDir}`));
   console.log(chalk.gray(`  ✓ Copied ${visibleFiles.length} visible input files`));
   console.log(chalk.gray("  ✓ Loaded prompt"));
-} else {
-  console.log(chalk.gray(`Temp directory: ${tempDir}`));
 }
 
 if (argv.verbose) {

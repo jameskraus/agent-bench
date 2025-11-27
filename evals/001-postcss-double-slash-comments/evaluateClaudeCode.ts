@@ -69,8 +69,6 @@ if (argv.verbose) {
   console.log(chalk.gray(`  ✓ Created temp directory: ${tempDir}`));
   console.log(chalk.gray("  ✓ Copied input files (excluding hidden tests)"));
   console.log(chalk.gray("  ✓ Loaded prompt"));
-} else {
-  console.log(chalk.gray(`Temp directory: ${tempDir}`));
 }
 
 // Install dependencies
