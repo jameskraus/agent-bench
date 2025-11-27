@@ -76,7 +76,7 @@ if (argv.verbose) {
   console.log(chalk.blue("\n📦 Installing dependencies"));
 }
 
-const installProcess = Bun.spawn(["npm", "install"], {
+const installProcess = Bun.spawn(["bun", "install"], {
   cwd: tempDir,
   stdout: argv.verbose ? "inherit" : "pipe",
   stderr: argv.verbose ? "inherit" : "pipe",
