@@ -32,7 +32,7 @@ console.log("Copying expected implementations...");
 copyDir(expectedDir, tempDir);
 
 console.log("\nInstalling dependencies...");
-const installProcess = Bun.spawn(["npm", "install"], {
+const installProcess = Bun.spawn(["bun", "install"], {
   cwd: tempDir,
   stdout: "inherit",
   stderr: "inherit",
