@@ -21,7 +21,7 @@ const argv = yargs(hideBin(process.argv))
   .alias("help", "h")
   .parseSync();
 
-const tempDir = join(import.meta.dir, "temp");
+const tempDir = join(import.meta.dir, `temp-${crypto.randomUUID()}`);
 const inputDir = join(import.meta.dir, "input");
 const promptFile = join(import.meta.dir, "prompt.md");
 
